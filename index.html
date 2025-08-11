@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Skarbonka</title>
+<style>
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 520px;
+    margin: auto;
+    padding: 20px;
+    background: #f0f0f5;
+    color: #222;
+  }
+
+  h1 {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-size: 2rem;
+  }
+
+  .header-icon {
+    font-size: 2.2rem;
+  }
+
+  h2 {
+    margin-top: 32px;
+    font-weight: 700;
+    font-size: 1.4rem;
+    border-bottom: 2px solid #4caf50;
+    padding-bottom: 4px;
+  }
+
+  #mainView input[type="text"],
+  #mainView input[type="number"] {
+    width: 100%;
+    padding: 12px 14px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    border: 1.8px solid #bbb;
+    font-size: 1.1rem;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+  }
+
+  #mainView input[type="text"]:focus,
+  #mainView input[type="number"]:focus {
+    border-color: #4caf50;
+    outline: none;
+  }
+
+  .goal {
+    background: white;
+    padding: 16px 20px;
+    margin: 10px 0;
+    border-radius: 18px;
+    box-shadow: 0 2px 7px rgb(0 0 0 / 0.1);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .goal:hover {
+    background: #e0f2e9;
+  }
+
+  .progress {
+    height: 24px;
+    background: #ddd;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: #4caf50;
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  button {
+    padding: 12px 18px;
+    margin: 6px 6px 6px 0;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    min-width: 72px;
+    box-shadow: 0 2px 5px rgb(0 0 0 / 0.12);
+    transition: background-color 0.3s, transform 0.15s;
+  }
+
+  button:hover {
+    transform: scale(1.06);
+  }
+
+  .btn-green {
+    background: #4caf50;
+    color: white;
+  }
+
+  .btn-red {
+    background: #f44336;
+    color: white;
+  }
+
+  .btn-blue {
+    background: #2196f3;
+    color: white;
+  }
+
+  .section-title {
+    font-weight: 700;
+    margin-top: 20px;
+    margin-bottom: 6px;
+    font-size: 1.2rem;
+    color: #333;
+  }
+
+  .empty-text {
+    text-align: center;
+    color: #888;
+    padding: 14px 0;
+    font-size: 1.1rem;
+    font-style: italic;
+  }
+
+  #detailView {
+    margin-top: 12px;
+  }
+
+  #goalTitle {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+  }
+
+  #statusText {
+    font-size: 1.1rem;
+    margin-top: 6px;
+  }
+
+  /* Grupy przycisków z małym odstępem */
+  .btn-group {
+    margin-bottom: 10px;
+  }
+
+</style>
+</head>
+<body>
+
+<h1>
+  <span class="header-icon" aria-label="Skarbonka">🐷</span>
+  Skarbonka
+  <span class="header-icon" aria-label="Monety">💰</span>
+</h1>
+
+<div id="mainView">
+  <h2>Twoje cele</h2>
+  <div id="goalsList"></div>
+
+  <h2>Ukończone cele</h2>
+  <div id="completedGoals"></div>
+
+  <h2>Dodaj nowy cel</h2>
+  <input id="goalName" type="text" placeholder="Nazwa celu" />
+  <input id="goalAmount" type="number" min="0.01" step="0.01" placeholder="Kwota (zł)" />
+  <button class="btn-green" onclick="addGoal()">Dodaj cel</button>
+</div>
+
+<div id="detailView" style="display:none;">
+  <button class="btn-blue" onclick="backToMain()">⬅ Powrót</button>
+  <h2 id="goalTitle"></h2>
+  <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+  <p id="statusText"></p>
+
+  <div class="section-title">Dodaj pieniądze</div>
+
+  <div class="section-title" style="font-weight:600; font-size:1rem; margin-top:0;">Grosze</div>
+  <div id="coinsAdd" class="btn-group"></div>
+
+  <div class="section-title" style="font-weight:600; font-size:1rem; margin-top:12px;">Złotówki</div>
+  <div id="notesAdd" class="btn-group"></div>
+
+  <div class="section-title" style="margin-top: 28px;">Odejmij pieniądze</div>
+
+  <div class="section-title" style="font-weight:600; font-size:1rem; margin-top:0;">Grosze</div>
+  <div id="coinsSub" class="btn-group"></div>
+
+  <div class="section-title" style="font-weight:600; font-size:1rem; margin-top:12px;">Złotówki</div>
+  <div id="notesSub" class="btn-group"></div>
+
+  <div class="section-title" style="margin-top: 28px;">Inna kwota</div>
+  <button class="btn-green" onclick="customAdd()">Dodaj własną kwotę</button>
+  <button class="btn-red" onclick="customSubtract()">Odejmij własną kwotę</button>
+
+  <div class="section-title" style="margin-top: 28px;">Zarządzanie celem</div>
+  <button class="btn-blue" onclick="editGoal()">✏️ Edytuj cel</button>
+  <button class="btn-red" onclick="deleteGoal()">🗑️ Usuń cel</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+let goals = JSON.parse(localStorage.getItem('goals')) || [];
+let currentGoalIndex = null;
+
+const coinValues = [0.01, 0.02, 0.05, 0.10, 0.20, 0.50];
+const noteValues = [1, 2, 5, 10, 20, 50, 100, 200, 500];
+
+function saveGoals() {
+  localStorage.setItem('goals', JSON.stringify(goals));
+}
+
+function renderGoals() {
+  const list = document.getElementById('goalsList');
+  const completedList = document.getElementById('completedGoals');
+  list.innerHTML = '';
+  completedList.innerHTML = '';
+
+  const activeGoals = goals.filter(g => g.saved < g.amount);
+  const doneGoals = goals.filter(g => g.saved >= g.amount);
+
+  if (activeGoals.length === 0)
+    list.innerHTML = `<div class="empty-text">Brak celów</div>`;
+  if (doneGoals.length === 0)
+    completedList.innerHTML = `<div class="empty-text">Brak ukończonych celów</div>`;
+
+  activeGoals.forEach(g => {
+    let index = goals.indexOf(g);
+    let percent = g.amount > 0 ? (g.saved / g.amount) * 100 : 0;
+    const div = document.createElement('div');
+    div.className = 'goal';
+    div.innerHTML = `<strong>${g.name}</strong><br>${g.saved.toFixed(2)} zł / ${g.amount.toFixed(2)} zł
+      <div class="progress"><div class="progress-bar" style="width:${percent}%;"></div></div>`;
+    div.onclick = () => openGoal(index);
+    list.appendChild(div);
+  });
+
+  doneGoals.forEach(g => {
+    let index = goals.indexOf(g);
+    const div = document.createElement('div');
+    div.className = 'goal';
+    div.innerHTML = `<strong>${g.name}</strong><br>Uzbierano: ${g.amount.toFixed(2)} zł ✅`;
+    div.onclick = () => openGoal(index);
+    completedList.appendChild(div);
+  });
+}
+
+function addGoal() {
+  const name = document.getElementById('goalName').value.trim();
+  const amount = parseFloat(document.getElementById('goalAmount').value);
+  if (!name || isNaN(amount) || amount <= 0) return alert("Podaj poprawne dane");
+  goals.push({ name, amount, saved: 0 });
+  saveGoals();
+  document.getElementById('goalName').value = '';
+  document.getElementById('goalAmount').value = '';
+  renderGoals();
+}
+
+function openGoal(index) {
+  currentGoalIndex = index;
+  document.getElementById('mainView').style.display = 'none';
+  document.getElementById('detailView').style.display = 'block';
+  updateDetailUI();
+}
+
+function backToMain() {
+  document.getElementById('mainView').style.display = 'block';
+  document.getElementById('detailView').style.display = 'none';
+  renderGoals();
+}
+
+function updateDetailUI() {
+  const g = goals[currentGoalIndex];
+  document.getElementById('goalTitle').textContent = `Cel: ${g.name}`;
+  let percent = g.amount > 0 ? (g.saved / g.amount) * 100 : 0;
+  document.getElementById('progressBar').style.width = percent + '%';
+  document.getElementById('statusText').textContent = `${g.saved.toFixed(2)} zł / ${g.amount.toFixed(2)} zł`;
+
+  const coinsAdd = document.getElementById('coinsAdd');
+  coinsAdd.innerHTML = '';
+  coinValues.forEach(v => {
+    let btn = document.createElement('button');
+    btn.className = 'btn-green';
+    btn.textContent = `+${(v * 100).toFixed(0)} gr`;
+    btn.onclick = () => addMoney(v);
+    coinsAdd.appendChild(btn);
+  });
+
+  const notesAdd = document.getElementById('notesAdd');
+  notesAdd.innerHTML = '';
+  noteValues.forEach(v => {
+    let btn = document.createElement('button');
+    btn.className = 'btn-green';
+    btn.textContent = `+${v} zł`;
+    btn.onclick = () => addMoney(v);
+    notesAdd.appendChild(btn);
+  });
+
+  const coinsSub = document.getElementById('coinsSub');
+  coinsSub.innerHTML = '';
+  coinValues.forEach(v => {
+    let btn = document.createElement('button');
+    btn.className = 'btn-red';
+    btn.textContent = `-${(v * 100).toFixed(0)} gr`;
+    btn.onclick = () => subtractMoney(v);
+    coinsSub.appendChild(btn);
+  });
+
+  const notesSub = document.getElementById('notesSub');
+  notesSub.innerHTML = '';
+  noteValues.forEach(v => {
+    let btn = document.createElement('button');
+    btn.className = 'btn-red';
+    btn.textContent = `-${v} zł`;
+    btn.onclick = () => subtractMoney(v);
+    notesSub.appendChild(btn);
+  });
+}
+
+function addMoney(amount) {
+  const g = goals[currentGoalIndex];
+  g.saved += amount;
+  if (g.saved >= g.amount) {
+    g.saved = g.amount;
+    confetti({ particleCount: 150, spread: 100 });
+  }
+  saveGoals();
+  updateDetailUI();
+}
+
+function subtractMoney(amount) {
+  const g = goals[currentGoalIndex];
+  g.saved -= amount;
+  if (g.saved < 0) g.saved = 0;
+  saveGoals();
+  updateDetailUI();
+}
+
+function customAdd() {
+  let amount = parseFloat(prompt("Podaj kwotę:"));
+  if (!isNaN(amount) && amount > 0) addMoney(amount);
+}
+
+function customSubtract() {
+  let amount = parseFloat(prompt("Podaj kwotę:"));
+  if (!isNaN(amount) && amount > 0) subtractMoney(amount);
+}
+
+function deleteGoal() {
+  if (confirm("Czy na pewno chcesz usunąć ten cel?")) {
+    goals.splice(currentGoalIndex, 1);
+    saveGoals();
+    backToMain();
+  }
+}
+
+function editGoal() {
+  let g = goals[currentGoalIndex];
+  let newName = prompt("Nowa nazwa celu:", g.name);
+  let newAmount = parseFloat(prompt("Nowa kwota celu:", g.amount));
+  if (newName && !isNaN(newAmount) && newAmount > 0) {
+    g.name = newName;
+    g.amount = newAmount;
+    if (g.saved > g.amount) g.saved = g.amount;
+    saveGoals();
+    updateDetailUI();
+  }
+}
+
+renderGoals();
+</script>
+
+</body>
+</html>
