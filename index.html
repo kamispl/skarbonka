@@ -17,7 +17,7 @@
 <title>Skarbonka</title>
 
 <style>
-  /* Twój oryginalny CSS */
+  
   body {
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     max-width: 520px;
@@ -216,7 +216,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
-  /* Twój oryginalny JS */
+
   let goals = JSON.parse(localStorage.getItem('goals')) || [];
   let currentGoalIndex = null;
 
@@ -393,6 +393,11 @@
       .catch(err => console.error("❌ Błąd SW:", err));
   }
 </script>
+  
+<footer style="text-align: center; font-size: 0.75rem; color: #888; margin-top: 40px; padding: 10px 0;">
+  by kamis
+</footer>
 
 </body>
 </html>
+
